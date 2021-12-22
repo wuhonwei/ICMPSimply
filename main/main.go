@@ -8,9 +8,9 @@ import (
 	"ICMPSimply_bingfa/ICMPSimply/state"
 	"flag"
 	"fmt"
-	"os"
+	"net/http"
+	"net/http/pprof"
 	"runtime"
-	"runtime/pprof"
 	"sort"
 )
 
@@ -37,18 +37,25 @@ func init() {
 }
 
 func main() {
+	go func() {
+		http.HandleFunc("/debug/pprof/block", pprof.Index)
+		http.HandleFunc("/debug/pprof/goroutine", pprof.Index)
+		http.HandleFunc("/debug/pprof/heap", pprof.Index)
+		http.ListenAndServe("0.0.0.0:8080", nil) //注意此处，遇到错误
+	}()
+
 	go state.CheckCPUAndMem()
 
-	f, err := os.Create("cpu.prof")
-	if err != nil {
-
-	}
-
-	// 获取系统信息
-	if err := pprof.StartCPUProfile(f); err != nil { //监控cpu
-
-	}
-	defer pprof.StopCPUProfile()
+	//f, err := os.Create("cpu.prof")
+	//if err != nil {
+	//
+	//}
+	//
+	//// 获取系统信息
+	//if err := pprof.StartCPUProfile(f); err != nil { //监控cpu
+	//
+	//}
+	//defer pprof.StopCPUProfile()
 
 	//go func() {
 	//	//logger.Info("%v", zap.Error(http.ListenAndServe("0.0.0.0:7070", nil)))
@@ -82,22 +89,22 @@ func main() {
 	//logger.Info("end measuring ...", zap.String("time", time.Since(start).String()))
 	logger.Info(fmt.Sprintf("manage\tend measuring...\tcpu:%v,mem:%v", state.LogCPU, state.LogMEM))
 
-	f1, err := os.Create("mem.prof")
-	if err != nil {
-
-	}
-	//runtime.GC()                                       // GC，获取最新的数据信息
-	if err := pprof.WriteHeapProfile(f1); err != nil { // 写入内存信息
-
-	}
-	f1.Close()
-	f2, err := os.Create("goroutine.prof")
-	if err != nil {
-
-	}
-	if gProf := pprof.Lookup("goroutine"); gProf == nil {
-	} else {
-		gProf.WriteTo(f2, 0)
-	}
-	f2.Close()
+	//f1, err := os.Create("mem.prof")
+	//if err != nil {
+	//
+	//}
+	////runtime.GC()                                       // GC，获取最新的数据信息
+	//if err := pprof.WriteHeapProfile(f1); err != nil { // 写入内存信息
+	//
+	//}
+	//f1.Close()
+	//f2, err := os.Create("goroutine.prof")
+	//if err != nil {
+	//
+	//}
+	//if gProf := pprof.Lookup("goroutine"); gProf == nil {
+	//} else {
+	//	gProf.WriteTo(f2, 0)
+	//}
+	//f2.Close()
 }
