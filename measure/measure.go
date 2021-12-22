@@ -26,8 +26,9 @@ var etcdLock sync.Mutex
 var failNumLock sync.Mutex
 var cells []statisticsAnalyse.Cell
 var failNumInSerier float64
-var failNumInPeriodPacketNum float64
 var totalNum float64
+
+const ReadyMeasure = "100"
 
 func Measure(conf *config.Config, confChan chan config.Config) {
 	//message := make([]protocol.Message, len(conf.Points)) //用来保存每个节点的测量配置
@@ -71,7 +72,7 @@ func Measure(conf *config.Config, confChan chan config.Config) {
 	}
 	etcdLock.Lock()
 	_, err = cli.PutService("/measure/slot", strconv.Itoa(len(conf.Points)))
-	_, err = cli.PutService("/measure/result/"+conf.Data.Hostname, "100")
+	_, err = cli.PutService("/measure/result/"+conf.Data.Hostname, ReadyMeasure)
 	etcdLock.Unlock()
 	if err != nil {
 		logger.Error(fmt.Sprintf("etcd PutService fail,hostname %v\tcpu:%v,mem:%v", conf.Data.Hostname, state.LogCPU, state.LogMEM))
