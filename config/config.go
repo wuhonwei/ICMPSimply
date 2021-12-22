@@ -174,7 +174,10 @@ func GetMeasureAgJson(configurationFilename, cfsFilename string) (*Config, error
 		if err != nil {
 			return nil, err
 		}
+		conf.Data.Hostname, conf.Data.MyPublicIp = GetCfgJson(cfsFilename)
 	}
+	err = yaml.Unmarshal(configBytes, conf)
+	conf.Data.Hostname, conf.Data.MyPublicIp = GetCfgJson(cfsFilename)
 	//configBytes, err = ioutil.ReadFile(configurationFilename)
 	//var stdin string
 	//_,err = fmt.Scan(&stdin)
@@ -184,7 +187,7 @@ func GetMeasureAgJson(configurationFilename, cfsFilename string) (*Config, error
 	//fmt.Println(string(byteArray))
 	//fmt.Println()
 	//err = json.Unmarshal(configBytes, conf)
-	err = yaml.Unmarshal(configBytes, conf)
+
 	if err != nil {
 		//logger.Error("can't find conf configurationFilename ", zap.String("filename", configurationFilename))
 		logger.Error(fmt.Sprintf("manage\tcan't find conf configurationFilename\tcpu:%v,mem:%v", state.LogCPU, state.LogMEM))

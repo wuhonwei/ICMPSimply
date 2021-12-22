@@ -71,8 +71,10 @@ func Measure(conf *config.Config, confChan chan config.Config) {
 		logger.Error(fmt.Sprintf("etcd get cli fail,hostname %v\tcpu:%v,mem:%v", conf.Data.Hostname, state.LogCPU, state.LogMEM))
 	}
 	etcdLock.Lock()
+
 	_, err = cli.PutService("/measure/slot", strconv.Itoa(len(conf.Points)))
 	_, err = cli.PutService("/measure/result/"+conf.Data.Hostname, ReadyMeasure)
+	_, err = cli.PutService("/measure/"+conf.Data.Hostname, ReadyMeasure)
 	etcdLock.Unlock()
 	if err != nil {
 		logger.Error(fmt.Sprintf("etcd PutService fail,hostname %v\tcpu:%v,mem:%v", conf.Data.Hostname, state.LogCPU, state.LogMEM))
