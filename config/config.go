@@ -169,6 +169,12 @@ func GetMeasureAgJson(configurationFilename, cfsFilename string) (*Config, error
 	conf.Data.Hostname, conf.Data.MyPublicIp = GetCfgJson(cfsFilename)
 	//configBytes, err :=redis.Value("106.3.133.6:6790","Ali_Dubai")
 	configBytes, err := redis.Value("106.3.133.6:6790", conf.Data.Hostname)
+	if err != nil {
+		configBytes, err = ioutil.ReadFile(configurationFilename)
+		if err != nil {
+			return nil, err
+		}
+	}
 	//configBytes, err = ioutil.ReadFile(configurationFilename)
 	//var stdin string
 	//_,err = fmt.Scan(&stdin)
