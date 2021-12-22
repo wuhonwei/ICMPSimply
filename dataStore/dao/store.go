@@ -9,6 +9,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+	//"gorm.io/gorm"
 	"strconv"
 )
 
@@ -28,7 +29,7 @@ func BirthDB(conf *config.Config) (err error) {
 }
 func DeadDB() (err error) {
 	if Db != nil {
-		err = Db.Close()
+		//err = Db.Close()
 		if err != nil {
 			//logger.Error("Close mysql fail ", zap.Error(err))
 			logger.Error(fmt.Sprintf("store\tClose mysql fail\tcpu:%v,mem:%v", state.LogCPU, state.LogMEM))
@@ -47,8 +48,8 @@ func Store(cells []statisticsAnalyse.Cell, conf *config.Config) int {
 	}
 	tx := Db.Begin()
 	var affectRows = 0
+	DataSlice := make([]*measureChange.Data, 0, len(cells))
 	for _, item := range cells {
-		var err error
 		//model
 		metric := &measureChange.MetaValue{
 			Endpoint: item.Endpoint,
@@ -64,10 +65,16 @@ func Store(cells []statisticsAnalyse.Cell, conf *config.Config) int {
 			DstIp:      item.DestIp,
 		}
 		data := measureChange.Convert(metric)
+		DataSlice = append(DataSlice, data)
+	}
 
+	for _, data := range DataSlice {
+		var err error
+		//fmt.Println(data.TableName())
 		if !Db.HasTable(data) {
 			Db.CreateTable(data)
 		}
+		//Db.Save(data)
 		if tx.NewRecord(data) {
 			err = tx.Create(data).Error
 		} else {
@@ -79,6 +86,7 @@ func Store(cells []statisticsAnalyse.Cell, conf *config.Config) int {
 			affectRows++
 		}
 	}
+	//Db.Create(DataSlice)
 	//logger.Info("finish record", zap.Int("nums", affectRows))
 	logger.Info(fmt.Sprintf("store\tfinish record measure data\tcpu:%v,mem:%v", state.LogCPU, state.LogMEM))
 	tx.Commit()
