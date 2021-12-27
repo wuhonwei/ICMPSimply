@@ -36,13 +36,13 @@ func init() {
 	if win10 {
 		flag.StringVar(&logLevel, "logLevel", defaultLevel, "logLevel is invalid,use INFOLevel replace")
 		flag.StringVar(&logFile, "logFile", defaultLogFile, "logFile isn't exist,use stdout replace")
-		flag.BoolVar(&logStd, "logStd", false, "copy log output to stdout")
+		flag.BoolVar(&logStd, "logStd", true, "copy log output to stdout")
 	} else {
 		// go run main.go -logLevel info -logStd true
 		flag.StringVar(&logLevel, "logLevel", defaultLevel, "logLevel is invalid,useINFO Level replace")
 		flag.StringVar(&logFile, "logFile", defaultLogFile, "logFile isn't exist,use stdout replace")
 		//flag.StringVar(&logFile, "logFile", defaultLogFileLinux, "logFile isn't exist,use stdout replace")
-		flag.BoolVar(&logStd, "logStd", false, "copy log output to stdout")
+		flag.BoolVar(&logStd, "logStd", true, "copy log output to stdout")
 	}
 	//对命令行参数进行解析
 	flag.Parse()

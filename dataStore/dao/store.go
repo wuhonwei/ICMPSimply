@@ -48,8 +48,9 @@ func Store(cells []statisticsAnalyse.Cell, conf *config.Config) int {
 	}
 	tx := Db.Begin()
 	var affectRows = 0
-	DataSlice := make([]*measureChange.Data, 0, len(cells))
+
 	for _, item := range cells {
+		var err error
 		//model
 		metric := &measureChange.MetaValue{
 			Endpoint: item.Endpoint,
@@ -65,16 +66,10 @@ func Store(cells []statisticsAnalyse.Cell, conf *config.Config) int {
 			DstIp:      item.DestIp,
 		}
 		data := measureChange.Convert(metric)
-		DataSlice = append(DataSlice, data)
-	}
 
-	for _, data := range DataSlice {
-		var err error
-		//fmt.Println(data.TableName())
 		if !Db.HasTable(data) {
 			Db.CreateTable(data)
 		}
-		//Db.Save(data)
 		if tx.NewRecord(data) {
 			err = tx.Create(data).Error
 		} else {

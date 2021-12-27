@@ -74,13 +74,12 @@ func Measure(conf *config.Config, confChan chan config.Config) {
 
 	_, err = cli.PutService("/measure/slot", strconv.Itoa(len(conf.Points)))
 	_, err = cli.PutService("/measure/result/"+conf.Data.Hostname, ReadyMeasure)
-	_, err = cli.PutService("/measure/"+conf.Data.Hostname, ReadyMeasure)
 	etcdLock.Unlock()
 	if err != nil {
 		logger.Error(fmt.Sprintf("etcd PutService fail,hostname %v\tcpu:%v,mem:%v", conf.Data.Hostname, state.LogCPU, state.LogMEM))
 	}
 
-	watchKey := cli.Client.Watch(cli.Client.Ctx(), "/measure/"+conf.Data.Hostname, clientv3.WithPrefix())
+	watchKey := cli.Client.Watch(cli.Client.Ctx(), "/measure/target", clientv3.WithPrefix())
 	for recv := range watchKey {
 		logger.Info(string(recv.Events[0].Kv.Key) + fmt.Sprintf("etcd change,hostname %v\tcpu:%v,mem:%v", conf.Data.Hostname, state.LogCPU, state.LogMEM))
 		_, err = cli.PutService("/measure/result/"+conf.Data.Hostname, fmt.Sprintf("%f", 0.0))
